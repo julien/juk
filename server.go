@@ -56,6 +56,7 @@ func (s *Server) HandleFunc(path string, handler http.HandlerFunc, methods []str
 	if _, ok := s.routes[path]; ok {
 		return
 	}
+
 	s.routes[path] = Route{path, handler, methods}
 
 	// Create a mux route

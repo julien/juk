@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"github.com/gorilla/mux"
+	"github.com/julien/juk/api"
 )
 
 var (
@@ -67,7 +68,7 @@ func startServer(s *Server) {
 	}
 }
 
-func createHandler(d *Dispatcher, m *JobMsg) http.HandlerFunc {
+func createHandler(d *Dispatcher, m *api.JobMsg) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
 		defer r.Body.Close()
@@ -86,7 +87,7 @@ func createHandler(d *Dispatcher, m *JobMsg) http.HandlerFunc {
 			w.WriteHeader(http.StatusOK)
 		}
 		vars := mux.Vars(r)
-		d.Schedule(&Job{
+		d.Schedule(&api.Job{
 			Name:    m.Name,
 			Headers: r.Header,
 			Data:    body,
