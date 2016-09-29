@@ -17,6 +17,7 @@ type Route struct {
 }
 
 type Server struct {
+	secure   bool
 	certFile string
 	keyFile  string
 	mu       sync.Mutex
@@ -26,6 +27,7 @@ type Server struct {
 
 func NewServer(cfg *Config) *Server {
 	return &Server{
+		secure:   cfg.Secure,
 		certFile: cfg.Certfile,
 		keyFile:  cfg.Keyfile,
 		routes:   make(map[string]Route),
@@ -40,7 +42,7 @@ func NewServer(cfg *Config) *Server {
 }
 
 func (s *Server) Start() error {
-	if s.certFile != "" && s.keyFile != "" {
+	if s.secure && s.certFile != "" && s.keyFile != "" {
 		return s.server.ListenAndServeTLS(s.certFile, s.keyFile)
 	} else {
 		return s.server.ListenAndServe()

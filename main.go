@@ -43,8 +43,8 @@ func main() {
 
 	// create a server
 	srv := NewServer(cfg)
-
 	go startServer(srv)
+
 	go handleMessages(dsp, srv)
 
 	sigs := make(chan os.Signal)
