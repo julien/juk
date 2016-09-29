@@ -13,10 +13,14 @@ by default it's a file named juk.json.
 You can set the **JUNK_CONFIG** environment variable to override this behaviour.
 
 This configuration file sets
-    + The HTTP server address
-    + The HTTP server port
-    + Path of the certificate and key (Optional, only if you want to use HTTPS)
-    + The [NATS](http://nats.io) server host and port.
+
+    - The HTTP server address
+
+    - The HTTP server port
+
+    - Path of the certificate and key (Optional, only if you want to use HTTPS)
+
+    - The [NATS](http://nats.io) server host and port.
 
 Once done you can start juk by invoking
 
