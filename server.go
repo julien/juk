@@ -8,6 +8,7 @@ import (
 	"gopkg.in/tylerb/graceful.v1"
 
 	"github.com/gorilla/mux"
+	"github.com/nats-io/gnatsd/server"
 )
 
 type Route struct {
@@ -17,12 +18,13 @@ type Route struct {
 }
 
 type Server struct {
-	secure   bool
-	certFile string
-	keyFile  string
-	mu       sync.Mutex
-	routes   map[string]Route
-	server   *graceful.Server
+	secure     bool
+	certFile   string
+	keyFile    string
+	mu         sync.Mutex
+	routes     map[string]Route
+	server     *graceful.Server
+	natsServer *server.Server
 }
 
 func NewServer(cfg *Config) *Server {
@@ -38,6 +40,10 @@ func NewServer(cfg *Config) *Server {
 				Handler: mux.NewRouter(),
 			},
 		},
+		natsServer: server.New(&server.Options{
+			Host: cfg.NatsHost,
+			Port: cfg.NatsPort,
+		}),
 	}
 }
 
@@ -47,6 +53,15 @@ func (s *Server) Start() error {
 	} else {
 		return s.server.ListenAndServe()
 	}
+
+}
+
+func (s *Server) RunNatsServer() {
+	go s.natsServer.Start()
+}
+
+func (s *Server) ShutdownNatsServer() {
+	s.natsServer.Shutdown()
 }
 
 func (s *Server) HandleFunc(path string, handler http.HandlerFunc, methods []string) {
@@ -59,7 +74,6 @@ func (s *Server) HandleFunc(path string, handler http.HandlerFunc, methods []str
 
 	s.routes[path] = Route{path, handler, methods}
 
-	// Create a mux route
 	r := s.server.Server.Handler.(*mux.Router)
 	r.HandleFunc(path, handler)
 	r.Methods(methods...)

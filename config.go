@@ -6,9 +6,12 @@ import (
 )
 
 const (
-	DefaultAddr    = "127.0.0.1"
-	DefaultPort    = "8000"
-	DefaultNatsURL = "0.0.0.0:4222"
+	DefaultAddr = "127.0.0.1"
+	DefaultPort = "8000"
+
+	// DefaultNatsURL = "0.0.0.0:4222"
+	DefaultNatsHost = "127.0.0.1"
+	DefaultNatsPort = 4222
 )
 
 // Config holds the necessary values needed to start the HTTP server
@@ -19,7 +22,10 @@ type Config struct {
 	Secure   bool   `json:"secure,omitempty"`
 	Certfile string `json:"certfile,omitempty"`
 	Keyfile  string `json:"keyfile,omitempty"`
-	NatsURL  string `json:"nats_url"`
+
+	// NatsURL  string `json:"nats_url"`
+	NatsHost string `json:"nats_host"`
+	NatsPort int    `json:"nats_port"`
 }
 
 // LoadConfig returns a Config instance from a given file name or
@@ -45,8 +51,9 @@ func LoadConfig(name string) (*Config, error) {
 // DefaultConfig returns a Config instance with default values.
 func DefaultConfig() *Config {
 	return &Config{
-		Address: DefaultAddr,
-		Port:    DefaultPort,
-		NatsURL: DefaultNatsURL,
+		Address:  DefaultAddr,
+		Port:     DefaultPort,
+		NatsHost: DefaultNatsHost,
+		NatsPort: DefaultNatsPort,
 	}
 }

@@ -33,18 +33,19 @@ func main() {
 		return
 	}
 
+	// create a server
+	srv := NewServer(cfg)
+	startNatsServer(srv, cfg)
+	go startServer(srv, cfg)
+
 	// create dispatcher
-	dsp, err := NewDispatcher(cfg.NatsURL)
+	dsp, err := NewDispatcher(cfg.NatsHost, cfg.NatsPort)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%s\n", err)
 		return
 	}
 	defer dsp.Close()
 	go dsp.Run()
-
-	// create a server
-	srv := NewServer(cfg)
-	go startServer(srv)
 
 	go handleMessages(dsp, srv)
 
@@ -61,11 +62,17 @@ func main() {
 
 }
 
-func startServer(s *Server) {
-	fmt.Println("starting server")
+func startServer(s *Server, cfg *Config) {
+	fmt.Printf("starting HTTP server on %s:%s\n", cfg.Address, cfg.Port)
 	if err := s.Start(); err != nil {
 		fmt.Fprintf(os.Stderr, "%s\n", err)
 	}
+}
+
+func startNatsServer(s *Server, cfg *Config) {
+	fmt.Printf("starting NATS server on %s:%d\n", cfg.NatsHost, cfg.NatsPort)
+	s.RunNatsServer()
+	defer s.ShutdownNatsServer()
 }
 
 func createHandler(d *Dispatcher, m *api.JobMsg) http.HandlerFunc {

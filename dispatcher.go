@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/julien/juk/api"
 	"github.com/nats-io/nats"
 )
@@ -16,10 +18,11 @@ type Dispatcher struct {
 
 // NewDispatcher returns a new Dispatcher instance given a URL
 // or an error if the connection to NATS fails.
-func NewDispatcher(url string) (*Dispatcher, error) {
+func NewDispatcher(host string, port int) (*Dispatcher, error) {
 
-	conn, err := api.CreateEncodedConn(url)
+	conn, err := api.CreateEncodedConn(host, port)
 	if err != nil {
+		fmt.Println("connection error, oh shit: %s\n", err)
 		return nil, err
 	}
 

@@ -6,9 +6,6 @@ JUK is a simple webhook utility.
 You need [go](http://golang.org), and make sure it's installed
 and setup [correctly](https://golang.org/doc/install#testing).
 
-You'll also need a [NATS](htt://nats.io)
-[server](http://nats.io/download/nats-io/gnatsd/).
-
 # Usage
 JUK works with a (json) configuration file,
 by default it's a file named juk.json.
@@ -19,7 +16,7 @@ This configuration file sets
     + The HTTP server address
     + The HTTP server port
     + Path of the certificate and key (Optional, only if you want to use HTTPS)
-    + The [NATS](http://nats.io) server address to connect to.
+    + The [NATS](http://nats.io) server host and port.
 
 Once done you can start juk by invoking
 
@@ -27,7 +24,7 @@ Once done you can start juk by invoking
 juk [optional config filepath]
 ```
 
-Clients can the connect to the same NATS server and register jobs, by publishing
+Clients can the connect to the NATS server and register jobs, by publishing
 a ```job.register``` event with the following information.
 
 ```
