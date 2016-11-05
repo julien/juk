@@ -28,7 +28,7 @@ Once done you can start juk by invoking
 juk [optional config filepath]
 ```
 
-Clients can the connect to the NATS server and register jobs, by publishing
+Clients can then connect to the NATS server and register jobs, by publishing
 a ```job.register``` event with the following information.
 
 ```
