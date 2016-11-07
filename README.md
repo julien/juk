@@ -10,7 +10,7 @@ and setup [correctly](https://golang.org/doc/install#testing).
 JUK works with a (json) configuration file,
 by default it's a file named juk.json.
 
-You can set the **JUNK_CONFIG** environment variable to override this behaviour.
+You can set the **JUK_CONFIG** environment variable to override this behaviour.
 
 This configuration file sets
 
