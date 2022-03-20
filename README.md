@@ -1,17 +1,13 @@
 JUK is a "program" to handle web hooks.
 
-When started JUK listens on a http port for incoming web requests 
-(launched by these so called "web hooks") and will perform actions 
+When started JUK listens on a http port for incoming web requests
+(launched by these so called "web hooks") and will perform actions
 depending on what is specificed in the configuration file.
 
 Example use case:
 Let's say that each time something is "pushed" to your GitHub repository
 you want to do something, for example: store information about the change,
 run a test suite, sync with another branch, etc...
-
-
-
-
 
 # Installation
 You need [go](http://golang.org), and make sure it's installed
