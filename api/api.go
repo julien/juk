@@ -3,7 +3,7 @@ package api
 import (
 	"fmt"
 
-	"github.com/nats-io/nats"
+	"github.com/nats-io/nats.go"
 )
 
 const (

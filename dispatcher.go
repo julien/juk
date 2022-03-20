@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/julien/juk/api"
-	"github.com/nats-io/nats"
+	"github.com/nats-io/nats.go"
 )
 
 // Dispatcher is responsable for registering new Job hooks and
