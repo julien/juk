@@ -35,5 +35,6 @@ func main() {
 
 func execJob(m *api.Job) {
 	fmt.Printf("got a job\n%+v\n", m)
+	fmt.Println(m.Data)
 	// Do what you want with the job here
 }
