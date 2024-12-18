@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"sync"
 	"time"
@@ -27,7 +28,7 @@ type Server struct {
 	natsServer *server.Server
 }
 
-func NewServer(cfg *Config) *Server {
+func NewServer(cfg Config) *Server {
 	return &Server{
 		secure:   cfg.Secure,
 		certFile: cfg.Certfile,
@@ -53,7 +54,6 @@ func (s *Server) Start() error {
 	} else {
 		return s.server.ListenAndServe()
 	}
-
 }
 
 func (s *Server) RunNatsServer() {
@@ -77,4 +77,8 @@ func (s *Server) HandleFunc(path string, handler http.HandlerFunc, methods []str
 	r := s.server.Server.Handler.(*mux.Router)
 	r.HandleFunc(path, handler)
 	r.Methods(methods...)
+}
+
+func (s *Server) Shutdown(ctx context.Context) error {
+	return s.server.Shutdown(ctx)
 }

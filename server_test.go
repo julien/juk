@@ -1,36 +1,33 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"testing"
 	"time"
 )
 
 func TestNewServer(t *testing.T) {
-	c := &Config{
-		Address: DefaultAddr,
-		Port:    "3333",
-	}
-
-	s := NewServer(c)
+	cfg := Config{Address: DefaultAddr, Port: "4444"}
+	s := NewServer(cfg)
 	if s == nil {
-		t.Errorf("want a server, got nil")
+		t.Errorf("want a server")
+	}
+	if err := s.Shutdown(context.Background()); err != nil {
+		t.Errorf("got = %v", err)
 	}
 }
 
 func TestServerStart(t *testing.T) {
-	c := &Config{
-		Address: DefaultAddr,
-		Port:    "3333",
-	}
+	cfg := Config{Address: DefaultAddr, Port: "4444"}
 
-	s := NewServer(c)
+	s := NewServer(cfg)
 	if s == nil {
-		t.Errorf("want a server, got nil")
+		t.Errorf("want a server")
 	}
+	defer s.Shutdown(context.Background())
 
 	errCh := make(chan error)
-
 	go func(errCh chan error) {
 		errCh <- s.Start()
 	}(errCh)
@@ -41,7 +38,7 @@ func TestServerStart(t *testing.T) {
 	for {
 		select {
 		case e := <-errCh:
-			t.Errorf("%s\n", e)
+			t.Errorf("got = %v", e)
 
 		case <-timeoutCh:
 			s.server.Timeout = 0
@@ -53,15 +50,13 @@ func TestServerStart(t *testing.T) {
 }
 
 func TestServerHandleFunc(t *testing.T) {
-	c := &Config{
-		Address: DefaultAddr,
-		Port:    "4444",
-	}
+	cfg := Config{Address: DefaultAddr, Port: "4444"}
 
-	s := NewServer(c)
+	s := NewServer(cfg)
 	if s == nil {
-		t.Errorf("want a server, got nil")
+		t.Errorf("want a server")
 	}
+	defer s.Shutdown(context.Background())
 
 	errCh := make(chan error)
 
@@ -83,18 +78,15 @@ func TestServerHandleFunc(t *testing.T) {
 			t.Errorf("%s\n", e)
 
 		case <-handlerCh:
-
 			s.HandleFunc("/foo", handleFoo, []string{"GET"})
 
 		case <-reqCh:
-
-			req, err := http.NewRequest("GET",
-				"http://localhost:4444/foo", nil)
+			req, err := http.NewRequest("GET", "http://localhost:4444/foo", nil)
 			if err != nil {
 				t.Errorf("%s\n", err)
 			}
 
-			client := http.DefaultClient
+			client := &http.Client{}
 			resp, err := client.Do(req)
 			if err != nil {
 				t.Errorf("%s\n", err)
@@ -110,5 +102,4 @@ func TestServerHandleFunc(t *testing.T) {
 			return
 		}
 	}
-
 }

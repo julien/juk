@@ -27,9 +27,7 @@ type JobMsg struct {
 }
 
 func CreateEncodedConn(host string, port int) (*nats.EncodedConn, error) {
-
 	url := fmt.Sprintf("nats://%s:%d", host, port)
-
 	nc, err := nats.Connect(url)
 	if err != nil {
 		return nil, err

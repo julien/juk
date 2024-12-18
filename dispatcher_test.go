@@ -5,6 +5,8 @@ import (
 
 	"github.com/nats-io/gnatsd/server"
 	gnatsd "github.com/nats-io/gnatsd/test"
+
+	"github.com/julien/juk/api"
 )
 
 func runDefaultServer() *server.Server {
@@ -17,17 +19,17 @@ func TestNewDispatcher(t *testing.T) {
 	s := runDefaultServer()
 	defer s.Shutdown()
 
-	d, err := NewDispatcher("0.0.0.0:4666")
+	d, err := NewDispatcher("0.0.0.0", 4666)
 	if err != nil {
-		t.Errorf("got %v want a dispatcher\n", err)
+		t.Errorf("got = %v", err)
 	}
 	defer d.Close()
 
 	if d.conn == nil {
-		t.Errorf("got %v, want a connection\n", d.conn)
+		t.Errorf("got = %v", d.conn)
 	}
 
-	d.conn.Publish(RegisterJob, &JobMsg{
+	d.conn.Publish(api.RegisterJob, &api.JobMsg{
 		Name:    "test",
 		Path:    "/test",
 		Methods: []string{"GET"},
@@ -37,41 +39,38 @@ func TestNewDispatcher(t *testing.T) {
 		select {
 		case m := <-d.Messages():
 			if m.Name != "test" {
-				t.Errorf("got %s want test\n", m.Name)
+				t.Errorf("got = %v, want test", m.Name)
 			}
 			return
 		}
 	}
-
 }
 
 func TestNewDispatcherKO(t *testing.T) {
-
-	d, err := NewDispatcher("0.0.0.0:4666")
+	d, err := NewDispatcher("0.0.0.0", 4666)
 	if err == nil {
-		t.Errorf("want an error\n")
+		t.Errorf("want an error")
 	}
 	if d != nil {
-		t.Errorf("want dispatcher to be nil\n")
+		t.Errorf("got = %v, want nil", d)
 	}
-
 }
 
 func TestDispatcherRun(t *testing.T) {
 	s := runDefaultServer()
 	defer s.Shutdown()
 
-	d, err := NewDispatcher("0.0.0.0:4666")
+	d, err := NewDispatcher("0.0.0.0", 4666)
 	if err != nil {
-		t.Errorf("got %v want a dispatcher\n", err)
+		t.Errorf("got = %v", err)
 	}
 	defer d.Close()
 
 	if d.conn == nil {
-		t.Errorf("got %v, want a connection\n", d.conn)
+		t.Errorf("got = %v", d.conn)
 	}
 
-	d.conn.Publish(RegisterJob, &JobMsg{
+	d.conn.Publish(api.RegisterJob, &api.JobMsg{
 		Name:    "test",
 		Path:    "/test",
 		Methods: []string{"GET"},
@@ -79,19 +78,19 @@ func TestDispatcherRun(t *testing.T) {
 
 	go d.Run()
 
-	conn, err := CreateEncodedConn("0.0.0.0:4666")
+	conn, err := api.CreateEncodedConn("0.0.0.0", 4666)
 	if err != nil {
 		t.Errorf("%s\n", err)
 	}
 	defer conn.Close()
 
-	jobCh := make(chan *Job)
+	jobCh := make(chan *api.Job)
 	go func() {
-		conn.Subscribe("test", func(m *Job) {
+		conn.Subscribe("test", func(m *api.Job) {
 			jobCh <- m
 		})
 
-		d.Schedule(&Job{
+		d.Schedule(&api.Job{
 			Name: "test",
 			Data: []byte("test"),
 		})
@@ -101,15 +100,12 @@ func TestDispatcherRun(t *testing.T) {
 		select {
 		case j := <-jobCh:
 			if j == nil {
-				t.Errorf("want a job\n")
+				t.Errorf("want a job")
 			}
-
 			if j.Name != "test" {
-				t.Errorf("want \"test\", got %s\n", j.Name)
+				t.Errorf(`got = %v, want "test"`, j.Name)
 			}
-
 			return
 		}
 	}
-
 }

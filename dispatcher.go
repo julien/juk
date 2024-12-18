@@ -1,10 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"github.com/nats-io/nats.go"
 
 	"github.com/julien/juk/api"
-	"github.com/nats-io/nats.go"
 )
 
 // Dispatcher is responsable for registering new Job hooks and
@@ -19,10 +18,8 @@ type Dispatcher struct {
 // NewDispatcher returns a new Dispatcher instance given a URL
 // or an error if the connection to NATS fails.
 func NewDispatcher(host string, port int) (*Dispatcher, error) {
-
 	conn, err := api.CreateEncodedConn(host, port)
 	if err != nil {
-		fmt.Println("connection error, oh shit: %s\n", err)
 		return nil, err
 	}
 
@@ -34,11 +31,9 @@ func NewDispatcher(host string, port int) (*Dispatcher, error) {
 	}
 
 	dsp.conn.Subscribe(api.RegisterJob, func(m *api.JobMsg) {
-
 		if _, ok := dsp.channels[m.Name]; ok {
 			return
 		}
-
 		dsp.channels[m.Name] = make(chan *api.Job)
 		dsp.conn.BindSendChan(m.Name, dsp.channels[m.Name])
 
@@ -71,8 +66,7 @@ func (d *Dispatcher) Run() {
 		select {
 		case j := <-d.jobCh:
 			go func(j *api.Job) {
-				ch, ok := d.channels[j.Name]
-				if ok {
+				if ch, ok := d.channels[j.Name]; ok {
 					ch <- j
 				}
 			}(j)

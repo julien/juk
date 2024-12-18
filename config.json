@@ -4,6 +4,6 @@
   "secure": false,
   "certfile": "cert.pem",
   "keyfile": "key.pem",
-  "nats_host": "localhost",
+  "nats_host": "127.0.0.1",
   "nats_port": 4222
 }

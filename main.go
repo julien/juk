@@ -2,29 +2,26 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/gorilla/mux"
+
 	"github.com/julien/juk/api"
 )
 
-var (
-	envConfig = os.Getenv("JUK_CONFIG")
-)
-
 func main() {
-
-	var path string
-	if envConfig != "" {
-		path = envConfig
-	} else if len(os.Args) == 2 {
-		path = os.Args[1]
-	} else {
-		path = "config.json"
+	path := os.Getenv("JUK_CONFIG")
+	if strings.TrimSpace(path) == "" {
+		if len(os.Args) > 1 {
+			path = os.Args[1]
+		} else {
+			path = "config.json"
+		}
 	}
 
 	cfg, err := LoadConfig(path)
@@ -49,7 +46,7 @@ func main() {
 
 	go handleMessages(dsp, srv)
 
-	sigs := make(chan os.Signal)
+	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	for {
@@ -59,17 +56,16 @@ func main() {
 			os.Exit(0)
 		}
 	}
-
 }
 
-func startServer(s *Server, cfg *Config) {
+func startServer(s *Server, cfg Config) {
 	fmt.Printf("starting HTTP server on %s:%s\n", cfg.Address, cfg.Port)
 	if err := s.Start(); err != nil {
 		fmt.Fprintf(os.Stderr, "%s\n", err)
 	}
 }
 
-func startNatsServer(s *Server, cfg *Config) {
+func startNatsServer(s *Server, cfg Config) {
 	fmt.Printf("starting NATS server on %s:%d\n", cfg.NatsHost, cfg.NatsPort)
 	s.RunNatsServer()
 	defer s.ShutdownNatsServer()
@@ -77,7 +73,7 @@ func startNatsServer(s *Server, cfg *Config) {
 
 func createHandler(d *Dispatcher, m *api.JobMsg) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		body, err := ioutil.ReadAll(r.Body)
+		body, err := io.ReadAll(r.Body)
 		defer r.Body.Close()
 
 		if err != nil {

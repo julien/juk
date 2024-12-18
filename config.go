@@ -6,10 +6,8 @@ import (
 )
 
 const (
-	DefaultAddr = "127.0.0.1"
-	DefaultPort = "8000"
-
-	// DefaultNatsURL = "0.0.0.0:4222"
+	DefaultAddr     = "127.0.0.1"
+	DefaultPort     = "8000"
 	DefaultNatsHost = "127.0.0.1"
 	DefaultNatsPort = 4222
 )
@@ -22,35 +20,30 @@ type Config struct {
 	Secure   bool   `json:"secure,omitempty"`
 	Certfile string `json:"certfile,omitempty"`
 	Keyfile  string `json:"keyfile,omitempty"`
-
-	// NatsURL  string `json:"nats_url"`
 	NatsHost string `json:"nats_host"`
 	NatsPort int    `json:"nats_port"`
 }
 
 // LoadConfig returns a Config instance from a given file name or
 // an error if the file could not be read or decoded.
-func LoadConfig(name string) (*Config, error) {
+func LoadConfig(name string) (Config, error) {
 	f, err := os.Open(name)
 	if err != nil {
-		return nil, err
+		return Config{}, err
 	}
 	defer f.Close()
 
-	cfg := &Config{}
-
+	cfg := Config{}
 	dec := json.NewDecoder(f)
-	err = dec.Decode(cfg)
-
-	if err != nil {
-		return nil, err
+	if err = dec.Decode(&cfg); err != nil {
+		return Config{}, err
 	}
 	return cfg, nil
 }
 
 // DefaultConfig returns a Config instance with default values.
-func DefaultConfig() *Config {
-	return &Config{
+func DefaultConfig() Config {
+	return Config{
 		Address:  DefaultAddr,
 		Port:     DefaultPort,
 		NatsHost: DefaultNatsHost,

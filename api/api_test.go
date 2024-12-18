@@ -7,7 +7,6 @@ import (
 )
 
 func TestCreateEncodedConn(t *testing.T) {
-
 	opts := gnatsd.DefaultTestOptions
 	opts.Port = 6666
 	s := gnatsd.RunServer(&opts)
