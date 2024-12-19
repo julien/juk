@@ -12,7 +12,7 @@ func TestCreateEncodedConn(t *testing.T) {
 	s := gnatsd.RunServer(&opts)
 	defer s.Shutdown()
 
-	c, err := CreateEncodedConn("0.0.0.0:6666")
+	c, err := CreateEncodedConn("localhost", 6666)
 	if err != nil {
 		t.Errorf("%s\n", err)
 	}

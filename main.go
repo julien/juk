@@ -1,12 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 
 	"github.com/gorilla/mux"
@@ -15,44 +15,46 @@ import (
 )
 
 func main() {
-	path := os.Getenv("JUK_CONFIG")
-	if strings.TrimSpace(path) == "" {
-		if len(os.Args) > 1 {
-			path = os.Args[1]
-		} else {
-			path = "config.json"
-		}
+	ctx := context.Background()
+	if err := run(ctx, os.Args, os.Stdout, os.Stderr); err != nil {
+		fmt.Fprintf(os.Stderr, "%v", err)
+		os.Exit(1)
+	}
+}
+
+func run(ctx context.Context, args []string, stdout, stderr io.Writer) error {
+	ctx, cancel := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
+	defer cancel()
+
+	path := DefaultConfigPath
+	if len(args) > 1 {
+		path = args[1]
 	}
 
-	cfg, err := LoadConfig(path)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "%s\n", err)
-		return
+	var cfg Config
+	if err := cfg.From(path); err != nil {
+		fmt.Fprintf(stderr, "%v", err)
+		return err
 	}
 
-	// create a server
 	srv := NewServer(cfg)
 	startNatsServer(srv, cfg)
 	go startServer(srv, cfg)
 
-	// create dispatcher
 	dsp, err := NewDispatcher(cfg.NatsHost, cfg.NatsPort)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%s\n", err)
-		return
+		fmt.Fprintf(stderr, "%v", err)
+		return err
 	}
 	defer dsp.Close()
 	go dsp.Run()
 
 	go handleMessages(dsp, srv)
 
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-
 	for {
 		select {
-		case <-sigs:
-			fmt.Println("\nstopping")
+		case <-ctx.Done():
+			fmt.Fprintf(stdout, "\nbye\n")
 			os.Exit(0)
 		}
 	}
