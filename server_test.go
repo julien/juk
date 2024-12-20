@@ -8,7 +8,7 @@ import (
 )
 
 func TestNewServer(t *testing.T) {
-	cfg := Config{Address: DefaultAddr, Port: "4444"}
+	cfg := Config{Addr: DefaultAddr, Port: "4444"}
 	s := NewServer(cfg)
 	if s == nil {
 		t.Errorf("want a server")
@@ -19,7 +19,7 @@ func TestNewServer(t *testing.T) {
 }
 
 func TestServerStart(t *testing.T) {
-	cfg := Config{Address: DefaultAddr, Port: "4444"}
+	cfg := Config{Addr: DefaultAddr, Port: "4444"}
 
 	s := NewServer(cfg)
 	if s == nil {
@@ -50,7 +50,7 @@ func TestServerStart(t *testing.T) {
 }
 
 func TestServerHandleFunc(t *testing.T) {
-	cfg := Config{Address: DefaultAddr, Port: "4444"}
+	cfg := Config{Addr: DefaultAddr, Port: "4444"}
 
 	s := NewServer(cfg)
 	if s == nil {

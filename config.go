@@ -15,7 +15,7 @@ const (
 )
 
 type Config struct {
-	Address  string `json:"address"`
+	Addr  string `json:"addr"`
 	Port     string `json:"port"`
 	Secure   bool   `json:"secure,omitempty"`
 	Certfile string `json:"certfile,omitempty"`

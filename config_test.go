@@ -8,8 +8,8 @@ func TestLoadConfigOK(t *testing.T) {
 		t.Errorf("got = %v", err)
 	}
 
-	if cfg.Address != DefaultAddr {
-		t.Errorf("got = %v, want = %v", cfg.Address, DefaultAddr)
+	if cfg.Addr != DefaultAddr {
+		t.Errorf("got = %v, want = %v", cfg.Addr, DefaultAddr)
 	}
 
 	if cfg.Port != DefaultPort {

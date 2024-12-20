@@ -61,7 +61,7 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) error {
 }
 
 func startServer(s *Server, cfg Config) {
-	fmt.Printf("starting HTTP server on %s:%s\n", cfg.Address, cfg.Port)
+	fmt.Printf("starting HTTP server on %s:%s\n", cfg.Addr, cfg.Port)
 	if err := s.Start(); err != nil {
 		fmt.Fprintf(os.Stderr, "%s\n", err)
 	}

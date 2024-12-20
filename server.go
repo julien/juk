@@ -37,7 +37,7 @@ func NewServer(cfg Config) *Server {
 		server: &graceful.Server{
 			Timeout: 10 * time.Second,
 			Server: &http.Server{
-				Addr:    cfg.Address + ":" + cfg.Port,
+				Addr:    cfg.Addr + ":" + cfg.Port,
 				Handler: mux.NewRouter(),
 			},
 		},
